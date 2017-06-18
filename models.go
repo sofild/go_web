@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	//"strconv"
 	//"strings"
+	"reflect"
 )
 
 type DbConf struct {
@@ -29,8 +30,9 @@ type Table struct {
 var db *sql.DB
 
 func (table *Table) Conn() *sql.DB {
-	var conf DbConf
-	conn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", conf.User, conf.Pass, conf.Host, conf.Port, conf.Db)
+	dbConf := table.Config
+	conn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", dbConf.User, dbConf.Pass, dbConf.Host, dbConf.Port, dbConf.Db)
+	fmt.Println(conn)
 	var err error
 	db, err = sql.Open("mysql", conn)
 	checkErr(err)
