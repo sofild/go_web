@@ -130,14 +130,16 @@ func GetArticles(where string, order string, limit string) []map[string]string {
 	for rows.Next() {
 		data := make(map[string]string)
 		var id int64
+		var cateid int64
 		var title string
 		var description string
 		var pic string
 		var content string
 		var addtime int64
-		err := rows.Scan(&id, &title, &description, &pic, &content, &addtime)
+		err := rows.Scan(&id, &cateid, &title, &description, &pic, &content, &addtime)
 		checkErr(err)
 		data["id"] = strconv.FormatInt(id, 10)
+		data["cateid"] = strconv.FormatInt(cateid, 10)
 		data["title"] = title
 		data["description"] = description
 		data["pic"] = pic
@@ -149,12 +151,12 @@ func GetArticles(where string, order string, limit string) []map[string]string {
 }
 
 //新增文章
-func AddArticles(title string, description string, pic string, content string) int64 {
-	sql := fmt.Sprintf("insert into %s (title, description, pic, content, addtime) values (?,?,?,?,?)", articlesTable)
+func AddArticles(cateid int, title string, description string, pic string, content string) int64 {
+	sql := fmt.Sprintf("insert into %s (cateid, title, description, pic, content, addtime) values (?,?,?,?,?,?)", articlesTable)
 	fmt.Println(sql)
 	stmt, err1 := myDb.Prepare(sql)
 	checkErr(err1)
-	res, err2 := stmt.Exec(title, description, pic, content, time.Now().Unix())
+	res, err2 := stmt.Exec(cateid, title, description, pic, content, time.Now().Unix())
 	checkErr(err2)
 	id, err3 := res.LastInsertId()
 	checkErr(err3)
