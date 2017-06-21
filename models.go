@@ -6,7 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	//"strconv"
 	//"strings"
-	"reflect"
+	//"reflect"
 )
 
 type DbConf struct {
