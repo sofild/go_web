@@ -87,7 +87,7 @@ func test(w http.ResponseWriter, r *http.Request) {
 
 	var table Table
 	table.Config.Db = "gotest"
-	table.Config.Host = "192.168.80.131"
+	table.Config.Host = "192.168.37.170"
 	table.Config.Port = "3306"
 	table.Config.User = "root"
 	table.Config.Pass = "root"
@@ -99,6 +99,8 @@ func test(w http.ResponseWriter, r *http.Request) {
 	table.Order = "id desc"
 	table.Condition = "parent_id=0"
 
-	table.Find()
-	//fmt.Println(re)
+	find_data := table.Find()
+    fmt.Println(find_data)
+    select_data := table.Select()
+    fmt.Println(select_data)
 }
