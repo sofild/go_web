@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	//"strconv"
+	"strconv"
 	//"strings"
-	//"reflect"
+	"reflect"
 )
 
 type DbConf struct {
@@ -50,43 +50,42 @@ func (table *Table) Find() {
 	rows, err1 := db.Query(sql)
 	checkErr(err1)
 	defer rows.Close()
+    fields := make([]interface{}, len(table.Field))
+    for idx,_ := range fields {
+        var field interface{}
+        fields[idx] = &field
+    }
 	for rows.Next() {
-		fields := table.Field
-		fmt.Println(fields)
-		//data := make(map[string]string)
-		err := rows.Scan(fields...)
+		data := make(map[string]string)
+        err := rows.Scan(fields...)
 		checkErr(err)
-		for i, key := range fields {
-			/*
-				var vKey string
-				//键
-				switch key.(type) {
-				case string:
-					vKey = string(key)
-				case int:
-					vKey = strconv.Itoa(key)
-				case int64:
-					vKey = strconv.FormatInt(key, 10)
-				default:
-					vKey = string(key)
-				}
-				//值
-				switch v.(type) {
-				case string:
-					data[vKey] = string(v)
-				case int:
-					data[vKey] = strconv.Itoa(v)
-				case int64:
-					data[vKey] = strconv.FormatInt(v, 10)
-				default:
-					data[vKey] = string(v)
-				}
-			*/
-			fmt.Println(i, key)
+		for i, key := range table.Field {
+			val := reflect.Indirect(reflect.ValueOf(fields[i])).Interface()
+            var value string
+            switch val.(type){
+                case []byte:
+                    if v, ok := val.([]byte); ok {
+                        value = string(v)
+                    }
+                case string:
+                    if v, ok := val.(string); ok {
+                        value = v
+                    }
+                case int:
+                    if v, ok := val.(int); ok {
+                        value = strconv.Itoa(v)
+                    }
+                case int64:
+                    if v, ok := val.(int64); ok {
+                        value = strconv.FormatInt(v, 10)
+                    }
+            }
+            data[key] = value
+            fmt.Println(key, value)
 		}
 
 	}
-	//return data
+	return data
 }
 
 /*
