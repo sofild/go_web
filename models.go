@@ -130,7 +130,13 @@ func (table *Table) Select() []map[string]string {
 
 //新增
 func (table *Table) Add() int64 {
-	sql := fmt.Sprintf("insert into %s (%s) values (?,?,?)", table.Name, strings.Join(table.Field, ","))
+    var values []string
+    fieldLen := len(table.Field)
+    for ;fieldLen>0; {
+       fieldLen--;
+       values = append(values, "?")
+    }
+	sql := fmt.Sprintf("insert into %s (%s) values (%s)", table.Name, strings.Join(table.Field, ","), strings.Join(values, ","))
 	fmt.Println(sql)
 	stmt, err1 := db.Prepare(sql)
 	checkErr(err1)
@@ -144,15 +150,17 @@ func (table *Table) Add() int64 {
 //更新
 func (table *Table) Update() int64 {
 	var st []string
-	for k, _ := range table.Field {
-		param := fmt.Sprintf("%s='%s'", k, table.Value[k])
+	for _, k := range table.Field {
+		param := fmt.Sprintf("%s=?", k)
 		st = append(st, param)
 	}
 	params := strings.Join(st, ",")
 	sql := fmt.Sprintf("update %s set %s where %s", table.Name, params, table.Condition)
 	fmt.Println(sql)
-	res, err := db.Exec(sql)
+	stmt, err := db.Prepare(sql)
 	checkErr(err)
+    res, err2 := stmt.Exec(table.Value...)
+    checkErr(err2)
 	num, err1 := res.RowsAffected()
 	checkErr(err1)
 	return num
