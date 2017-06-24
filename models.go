@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	//"strconv"
-	//"strings"
-	//"reflect"
+	"reflect"
+	"strconv"
+	"strings"
 )
 
 type DbConf struct {
@@ -21,7 +21,7 @@ type Table struct {
 	Config    DbConf
 	Name      string
 	Condition string
-	Field     []interface{}
+	Field     []string
 	Value     []interface{}
 	Order     string
 	Limit     string
@@ -39,57 +39,59 @@ func (table *Table) Conn() *sql.DB {
 	return db
 }
 
-func (table *Table) Find() {
+func FormatValue(val interface{}) string {
+	var value string
+	switch val.(type) {
+	case []byte:
+		if v, ok := val.([]byte); ok {
+			value = string(v)
+		}
+	case string:
+		if v, ok := val.(string); ok {
+			value = v
+		}
+	case int:
+		if v, ok := val.(int); ok {
+			value = strconv.Itoa(v)
+		}
+	case int64:
+		if v, ok := val.(int64); ok {
+			value = strconv.FormatInt(v, 10)
+		}
+	}
+	return value
+}
+
+func (table *Table) Find() map[string]string {
 	if table.Condition == "" {
 		table.Condition = "1=1"
 	}
 	if table.Order == "" {
 		table.Order = "id desc"
 	}
-	sql := fmt.Sprintf("select * from %s where %s order by %s limit 1", table.Name, table.Condition, table.Order)
+	field_str := strings.Join(table.Field, ",")
+	sql := fmt.Sprintf("select %s from %s where %s order by %s limit 1", field_str, table.Name, table.Condition, table.Order)
 	rows, err1 := db.Query(sql)
 	checkErr(err1)
 	defer rows.Close()
+	fields := make([]interface{}, len(table.Field))
+	for idx, _ := range fields {
+		var field interface{}
+		fields[idx] = &field
+	}
+	data := make(map[string]string)
 	for rows.Next() {
-		fields := table.Field
-		fmt.Println(fields)
-		//data := make(map[string]string)
 		err := rows.Scan(fields...)
 		checkErr(err)
-		for i, key := range fields {
-			/*
-				var vKey string
-				//键
-				switch key.(type) {
-				case string:
-					vKey = string(key)
-				case int:
-					vKey = strconv.Itoa(key)
-				case int64:
-					vKey = strconv.FormatInt(key, 10)
-				default:
-					vKey = string(key)
-				}
-				//值
-				switch v.(type) {
-				case string:
-					data[vKey] = string(v)
-				case int:
-					data[vKey] = strconv.Itoa(v)
-				case int64:
-					data[vKey] = strconv.FormatInt(v, 10)
-				default:
-					data[vKey] = string(v)
-				}
-			*/
-			fmt.Println(i, key)
+		for i, key := range table.Field {
+			val := reflect.Indirect(reflect.ValueOf(fields[i])).Interface()
+			value := FormatValue(val)
+			data[key] = value
 		}
-
 	}
-	//return data
+	return data
 }
 
-/*
 func (table *Table) Select() []map[string]string {
 	if table.Condition == "" {
 		table.Condition = "1=1"
@@ -97,28 +99,29 @@ func (table *Table) Select() []map[string]string {
 	if table.Order == "" {
 		table.Order = "id desc"
 	}
-	sql := fmt.Sprintf("select * from %s where %s order by %s limit %s", table.Name, table.Condition, table.Order, table.Limit)
+	field_str := strings.Join(table.Field, ",")
+	sql := fmt.Sprintf("select %s from %s where %s order by %s", field_str, table.Name, table.Condition, table.Order)
+	if table.Limit != "" {
+		sql = fmt.Sprintf("%s limit %s", sql, table.Limit)
+	}
 	fmt.Println(sql)
 	rows, err1 := db.Query(sql)
 	checkErr(err1)
 	defer rows.Close()
+	fields := make([]interface{}, len(table.Field))
+	for idx, _ := range fields {
+		var field interface{}
+		fields[idx] = &field
+	}
 	var datas []map[string]string
 	for rows.Next() {
 		data := make(map[string]string)
-		err := rows.Scan(table.Field...)
+		err := rows.Scan(fields...)
 		checkErr(err)
-		for k, v := range table.Value {
-			key := table.Field[k]
-			switch vType := v.(type) {
-			case string:
-				data[key] = v
-			case int:
-				data[key] = strconv.Itoa(v)
-			case int64:
-				data[key] = strconv.FormatInt(v, 10)
-			default:
-				data[key] = v
-			}
+		for i, key := range table.Field {
+			val := reflect.Indirect(reflect.ValueOf(fields[i])).Interface()
+			value := FormatValue(val)
+			data[key] = value
 		}
 		datas = append(datas, data)
 	}
@@ -127,7 +130,13 @@ func (table *Table) Select() []map[string]string {
 
 //新增
 func (table *Table) Add() int64 {
-	sql := fmt.Sprintf("insert into %s (%s) values (?,?,?)", table.Name, strings.Join(table.Field, ","))
+	var values []string
+	fieldLen := len(table.Field)
+	for fieldLen > 0 {
+		fieldLen--
+		values = append(values, "?")
+	}
+	sql := fmt.Sprintf("insert into %s (%s) values (%s)", table.Name, strings.Join(table.Field, ","), strings.Join(values, ","))
 	fmt.Println(sql)
 	stmt, err1 := db.Prepare(sql)
 	checkErr(err1)
@@ -141,15 +150,17 @@ func (table *Table) Add() int64 {
 //更新
 func (table *Table) Update() int64 {
 	var st []string
-	for k, v := range table.Field {
-		param := fmt.Sprintf("%s='%s'", k, table.Value[k])
+	for _, k := range table.Field {
+		param := fmt.Sprintf("%s=?", k)
 		st = append(st, param)
 	}
 	params := strings.Join(st, ",")
 	sql := fmt.Sprintf("update %s set %s where %s", table.Name, params, table.Condition)
 	fmt.Println(sql)
-	res, err := db.Exec(sql)
+	stmt, err := db.Prepare(sql)
 	checkErr(err)
+	res, err2 := stmt.Exec(table.Value...)
+	checkErr(err2)
 	num, err1 := res.RowsAffected()
 	checkErr(err1)
 	return num
@@ -159,16 +170,9 @@ func (table *Table) Update() int64 {
 func (table *Table) Del() int64 {
 	sql := fmt.Sprintf("Delete from %s where %s", table.Name, table.Condition)
 	fmt.Println(sql)
-	res, err1 := stmt.Exec(sql)
+	res, err1 := db.Exec(sql)
 	checkErr(err1)
 	num, err2 := res.RowsAffected()
 	checkErr(err2)
 	return num
 }
-
-func checkErr(err error) {
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-}
-*/
