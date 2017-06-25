@@ -5,14 +5,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>First Go web Project</title>
-  <!--<link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon">-->
-  <!--<link rel="apple-touch-icon-precomposed" href="../images/apple-touch-icon.png">-->
-  <!--<link rel="stylesheet" href="./assets/css/uikit.min.css">
-  <script src="./assets/js/jquery.js"></script>
-  <script src="./assets/js/uikit.min.js"></script>-->
+  <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon">
   <script>
-      window.BlogList = {};
-      window.PhotoList = {};
+      window.BlogList = {{.Blog}};
+      window.PhotoList = {{.Photo}};
+      window.CateList = {{.Cate}};
   </script>
 </head>
 <body>
@@ -24,16 +21,16 @@
   <div class="uk-offcanvas-bar">
     <ul class="uk-nav uk-nav-offcanvas">
       <li class="uk-active">
-        <a href="/">Frontpage</a>
+        <a href="/">首页</a>
       </li>
       <li>
-        <a href="/photo">Portfolio</a>
+        <a href="/photo">图片</a>
       </li>
       <li>
-        <a href="/blog">Blog</a>
+        <a href="/blog">文章</a>
       </li>
       <li>
-        <a href="/login" target="_blank">Login</a>
+        <a href="/login" target="_blank">登录</a>
       </li>
     </ul>
   </div>

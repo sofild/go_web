@@ -4,16 +4,16 @@
       <a class="uk-navbar-brand uk-hidden-small" href="layouts_frontpage.html">Brand</a>
       <ul class="uk-navbar-nav uk-hidden-small">
         <li class="uk-active">
-          <router-link to="/">Frontpage</router-link>
+          <router-link to="/">首页</router-link>
         </li>
         <li>
-          <router-link to="/photo">Portfolio</router-link>
+          <router-link to="/photo">图片</router-link>
         </li>
         <li>
-          <router-link to="/blog">Blog</router-link>
+          <router-link to="/blog">文章</router-link>
         </li>
         <li>
-          <a href="/login" target="_blank">Login</a>
+          <a href="/login" target="_blank">登录</a>
         </li>
       </ul>
       <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>

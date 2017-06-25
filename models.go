@@ -35,7 +35,7 @@ func (table *Table) Conn() *sql.DB {
 	fmt.Println(conn)
 	var err error
 	db, err = sql.Open("mysql", conn)
-	checkErr(err)
+	checkErr(err, 37)
 	return db
 }
 
@@ -106,9 +106,10 @@ func (table *Table) Select() []map[string]string {
 	}
 	fmt.Println(sql)
 	rows, err1 := db.Query(sql)
-	checkErr(err1)
+	checkErr(err1, 110)
 	defer rows.Close()
 	fields := make([]interface{}, len(table.Field))
+	fmt.Println(table.Field)
 	for idx, _ := range fields {
 		var field interface{}
 		fields[idx] = &field
@@ -117,7 +118,7 @@ func (table *Table) Select() []map[string]string {
 	for rows.Next() {
 		data := make(map[string]string)
 		err := rows.Scan(fields...)
-		checkErr(err)
+		checkErr(err, 120)
 		for i, key := range table.Field {
 			val := reflect.Indirect(reflect.ValueOf(fields[i])).Interface()
 			value := FormatValue(val)
@@ -175,4 +176,30 @@ func (table *Table) Del() int64 {
 	num, err2 := res.RowsAffected()
 	checkErr(err2)
 	return num
+}
+
+//设置字段
+func (table *Table) SetField(field ...string) {
+	data := make([]string, len(field))
+	for i, key := range field {
+		if key != "" {
+			data[i] = key
+		}
+	}
+	table.Field = data
+}
+
+//设置值
+func (table *Table) SetValue(value ...interface{}) {
+	data := make([]interface{}, len(value))
+	for i, key := range value {
+		data[i] = key
+	}
+	table.Value = data
+}
+
+func checkErr(err error, line ...int) {
+	if err != nil {
+		fmt.Println(line, err.Error())
+	}
 }
