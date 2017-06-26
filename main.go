@@ -7,13 +7,14 @@ import (
 	//"strconv"
 	"encoding/json"
 	"text/template"
+	//"reflect"
 )
 
 var table Table
 
 func main() {
 	table.Config.Db = "gotest"
-	table.Config.Host = "192.168.80.131"
+	table.Config.Host = "192.168.37.170"
 	table.Config.Port = "3306"
 	table.Config.User = "root"
 	table.Config.Pass = "root"
@@ -22,7 +23,7 @@ func main() {
 	http.Handle("/favicon.ico", http.FileServer(http.Dir("myweb/dist")))
 	http.Handle("/static/", http.FileServer(http.Dir("myweb/dist")))
 	http.HandleFunc("/", index)
-	http.HandleFunc("/login", login)
+	http.HandleFunc("/doLogin", doLogin)
 	http.HandleFunc("/test", test)
 	http.ListenAndServe(":8080", nil)
 }
@@ -49,33 +50,27 @@ func index(w http.ResponseWriter, r *http.Request) {
 	html.Execute(w, datas)
 }
 
-func login(w http.ResponseWriter, r *http.Request) {
+func doLogin(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	if len(r.Form) > 0 {
-		username := r.Form["username"][0]
-		password := r.Form["password"][0]
-		user := getUser(username, password)
-		var data map[string]string
-		if len(user) > 0 {
-			uid := user["id"]
-			data["uid"] = uid
-			fmt.Println(data)
-		} else {
-			data["err"] = "1"
-			data["msg"] = "用户名或密码错误！"
-			datas, err := json.Marshal(data)
-			checkErr(err, 66)
-			fmt.Println(datas)
-			io.WriteString(w, string(datas))
-		}
+	username := r.Form["username"][0]
+	password := r.Form["password"][0]
+	user := getUser(username, password)
+	data := make(map[string]string)
+	if len(user) > 0 {
+		uid := user["id"]
+        updateLogin(uid)
+		data["uid"] = uid
+        data["username"] = user["username"]
+        data["avatar"] = user["avatar"]
+        data["logintime"] = user["logintime"]
+		data["err"] = "0"
 	} else {
-		html, err := template.ParseFiles("myweb/dist/login.html")
-		if err != nil {
-			fmt.Println("Template parse failed:", err.Error())
-		}
-		datas := map[string]string{"datas": "Login"}
-		html.Execute(w, datas)
+		data["err"] = "1"
+		data["msg"] = "用户名或密码错误！"
 	}
+	datas, err := json.Marshal(data)
+	checkErr(err, 70)
+    io.WriteString(w, string(datas))
 }
 
 func test(w http.ResponseWriter, r *http.Request) {
@@ -154,9 +149,14 @@ func test(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(res)
 	*/
 
-	table.Name = "photos"
-	table.SetField("cateid", "image", "title", "addtime")
-	table.SetValue(5, "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1498377607811&di=d0ba7780b48369418bebf96141eea834&imgtype=0&src=http%3A%2F%2Fimg0.pcauto.com.cn%2Fpcauto%2F1405%2F30%2F4493541_100003604293146_thumb.gif", "好车图", 1497704998)
-	res := table.Add()
-	fmt.Println(res)
+	/*
+		table.Name = "photos"
+		table.SetField("cateid", "image", "title", "addtime")
+		table.SetValue(5, "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1498377607811&di=d0ba7780b48369418bebf96141eea834&imgtype=0&src=http%3A%2F%2Fimg0.pcauto.com.cn%2Fpcauto%2F1405%2F30%2F4493541_100003604293146_thumb.gif", "好车图", 1497704998)
+		res := table.Add()
+		fmt.Println(res)
+	*/
+
+	user := getUser("test", "1234")
+	fmt.Println(user)
 }

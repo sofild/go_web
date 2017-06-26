@@ -76,7 +76,7 @@
        }
     },
     methods: {
-      page: p => {
+      page: function(p){
         var start = (p-1)*9;
         var end = start + 9;
         this.nowPage = p;

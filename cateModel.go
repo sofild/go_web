@@ -21,6 +21,7 @@ func getCateNames(ids []string) map[string]string {
 	table.Name = "cate"
 	table.SetField("id", "name")
 	table.Order = "id desc"
+    ids = removeRepeatIds(ids)
 	table.Condition = fmt.Sprintf("id in (%s)", strings.Join(ids, ","))
 	cates := table.Select()
 	data := make(map[string]string)
@@ -38,4 +39,25 @@ func getCateList() []map[string]string {
 	table.Condition = "parent_id=0"
 	cates := table.Select()
 	return cates
+}
+
+func in_array(ids []string, id string) bool {
+    var re bool = false
+    for _, key := range ids {
+        if key == id {
+            re = true
+            break
+        }
+    }
+    return re
+}
+
+func removeRepeatIds(ids []string) []string {
+    var data []string
+    for _, id := range ids {
+        if !in_array(data, id) {
+            data = append(data, id)
+        }
+    }
+    return data
 }

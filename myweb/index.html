@@ -10,30 +10,36 @@
       window.BlogList = {{.Blog}};
       window.PhotoList = {{.Photo}};
       window.CateList = {{.Cate}};
+      window.ExtFunc = {
+        setCookie: function(name,value){
+          let Days = 30;
+          let exp = new Date();
+          exp.setTime(exp.getTime() + Days*24*60*60*1000);
+          document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+        },
+        getCookie: function(name){
+          let arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+          if(arr=document.cookie.match(reg)) {
+            return unescape(arr[2]);
+          }
+          else{
+            return null;
+          }
+        },
+        delCookie: function(name){
+          let exp = new Date();
+          exp.setTime(exp.getTime() - 1);
+          let cval = this.getCookie(name);
+          if(!!cval){
+            document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+          }
+        }
+      }
   </script>
 </head>
 <body>
-
 <div id="app">
 
-</div>
-<div id="offcanvas" class="uk-offcanvas">
-  <div class="uk-offcanvas-bar">
-    <ul class="uk-nav uk-nav-offcanvas">
-      <li class="uk-active">
-        <a href="/">首页</a>
-      </li>
-      <li>
-        <a href="/photo">图片</a>
-      </li>
-      <li>
-        <a href="/blog">文章</a>
-      </li>
-      <li>
-        <a href="/login" target="_blank">登录</a>
-      </li>
-    </ul>
-  </div>
 </div>
 </body>
 </html>
