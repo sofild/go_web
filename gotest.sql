@@ -1,23 +1,23 @@
 -- phpMyAdmin SQL Dump
--- version 4.4.11
+-- version phpStudy 2014
 -- http://www.phpmyadmin.net
 --
--- Host: 192.168.80.131:3306
--- Generation Time: 2017-06-25 13:00:47
--- 服务器版本： 5.7.17-log
--- PHP Version: 7.0.6
+-- 主机: localhost
+-- 生成日期: 2017 �?06 �?27 �?16:44
+-- 服务器版本: 5.5.40
+-- PHP 版本: 5.6.1
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
 
 --
--- Database: `gotest`
+-- 数据库: `gotest`
 --
 
 -- --------------------------------------------------------
@@ -27,14 +27,15 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `articles` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `cateid` int(11) DEFAULT '0' COMMENT '分类ID',
   `title` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `pic` varchar(255) DEFAULT NULL,
   `content` text,
-  `addtime` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+  `addtime` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=18 ;
 
 --
 -- 转存表中的数据 `articles`
@@ -66,11 +67,12 @@ INSERT INTO `articles` (`id`, `cateid`, `title`, `description`, `pic`, `content`
 --
 
 CREATE TABLE IF NOT EXISTS `cate` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_id` int(11) DEFAULT '0',
   `name` varchar(255) DEFAULT NULL,
-  `addtime` int(11) DEFAULT '0'
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='分类表';
+  `addtime` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='分类表' AUTO_INCREMENT=7 ;
 
 --
 -- 转存表中的数据 `cate`
@@ -88,12 +90,13 @@ INSERT INTO `cate` (`id`, `parent_id`, `name`, `addtime`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `photos` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `cateid` int(11) DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `addtime` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
+  `addtime` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=23 ;
 
 --
 -- 转存表中的数据 `photos`
@@ -130,74 +133,23 @@ INSERT INTO `photos` (`id`, `cateid`, `image`, `title`, `addtime`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `user` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(200) DEFAULT NULL COMMENT '用户名',
   `password` varchar(200) DEFAULT NULL COMMENT '密码',
   `email` varchar(200) DEFAULT NULL COMMENT '邮件',
-  `avatar` varchar(200) DEFAULT NULL COMMENT '头像',
+  `avatar` varchar(255) DEFAULT NULL COMMENT '头像',
   `addtime` int(11) DEFAULT '0' COMMENT '添加时间',
-  `logintime` int(11) DEFAULT '0' COMMENT '登录时间'
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户表';
+  `logintime` int(11) DEFAULT '0' COMMENT '登录时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=2 ;
 
 --
 -- 转存表中的数据 `user`
 --
 
 INSERT INTO `user` (`id`, `username`, `password`, `email`, `avatar`, `addtime`, `logintime`) VALUES
-(1, 'test', 'e10adc3949ba59abbe56e057f20f883e', 'test@admin.com', NULL, 0, 0);
+(1, 'test', '81dc9bdb52d04dc20036dbd8313ed055', 'test@admin.com', 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1498469950566&di=0e2bfc3c0ce2cbbae06c188da9606709&imgtype=jpg&src=http%3A%2F%2Fimg3.imgtn.bdimg.com%2Fit%2Fu%3D3797592229%2C3840448992%26fm%3D214%26gp%3D0.jpg', 1498472522, 1498476142);
 
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `articles`
---
-ALTER TABLE `articles`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `cate`
---
-ALTER TABLE `cate`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `photos`
---
-ALTER TABLE `photos`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `user`
---
-ALTER TABLE `user`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `articles`
---
-ALTER TABLE `articles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=18;
---
--- AUTO_INCREMENT for table `cate`
---
-ALTER TABLE `cate`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7;
---
--- AUTO_INCREMENT for table `photos`
---
-ALTER TABLE `photos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=23;
---
--- AUTO_INCREMENT for table `user`
---
-ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
